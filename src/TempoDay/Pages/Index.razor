@@ -1,3 +1,48 @@
 ﻿@page "/"
+@using DataLayer.DayColor
+@inject DayColorService dayColorService
 
-<h1>Hello, world!</h1>
+<h1>Latest day known</h1>
+
+<div>
+    @if (_data is null)
+    {
+        <p>@statusMsg</p>
+    }
+    else
+    {
+        <div>
+            <div>
+                <p>@_data.tempo_like_calendars.start_date.ToLongDateString()</p>
+                <p>@_data.tempo_like_calendars.end_date.ToLongDateString()</p>
+            </div>
+            <div>
+                @foreach (var value in _data.tempo_like_calendars.values)
+                {
+                    <p>@value.start_date.ToLongDateString()</p>
+                    <p>@value.end_date.ToLongDateString()</p>
+                    <p>@value.updated_date.ToLongDateString()</p>
+                    <p>@value.value</p>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code
+{
+    string statusMsg = "Loading...";
+    TempoLikeResponse? _data;
+
+    protected async override Task OnInitializedAsync()
+    {
+        try
+        {
+            _data = await dayColorService.GetDayColorAsync();
+        }
+        catch (Exception ex)
+        {
+            statusMsg = ex.Message;
+        }
+    }
+}
